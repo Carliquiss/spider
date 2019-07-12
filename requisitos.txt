@@ -1,0 +1,4 @@
+Que tenga modo verbose, modo para pasarle las listas, por defecto que saque las url locales
+y si se lo indicas con -e que saque las remotas.
+
+Probar con algun departamento pequeño
