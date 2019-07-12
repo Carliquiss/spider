@@ -1,28 +1,48 @@
 import requests
 from parsel import Selector
-import time
 
 
-URL = 'http://dtstc.ugr.es/it/itt_st/'
+#URL = 'http://dtstc.ugr.es/it/itt_st/'
+URL = 'https://hmedieval.ugr.es/'
 
-start = time.time()
+def selectLocalOrExternalLinks(enlaces, baseURL):
 
-### Crawling to the website
+    urlsLocales = []
+    urlsExternas = []
+    for enlace in enlaces:
 
-# GET request to recurship site
-response = requests.get(URL)
+        if(enlace.split("/")[0] == 'http:'):
+            comparacion = enlace.split("/")[2]
 
-## Setup for scrapping tool
+            if (comparacion == baseURL):
+                urlsLocales.append(enlace)
 
-# "response.txt" contain all web page content
-selector = Selector(response.text)
+            else:
+                urlsExternas.append(enlace)
 
-# Extracting href attribute from anchor tag <a href="*">
-href_links = selector.xpath('//a/@href').getall()
+        else:
+            urlsLocales.append(enlace)
 
-for enlaces in href_links:
-    print(enlaces)
+    print("Enlaces locales: ")
+    print(urlsLocales)
+    print("Enlaces externos: ")
+    print(urlsExternas)
 
 
-end = time.time()
-print("Ha tardado : ", (end-start))
+def getLinks(url):
+    #Accedemos a la páginas y nos quedamos con los href a otras urls
+    response = requests.get(url)
+    selector = Selector(response.text)
+    href_links = selector.xpath('//a/@href').getall()
+
+    for enlaces in href_links:
+        print(enlaces)
+
+
+    #Nos quedamos con los enlaces locales:
+    baseURL = url.split("/")[2]
+    selectLocalOrExternalLinks(href_links, baseURL)
+    #Nos quedamos con los enlaces externos:
+
+
+getLinks(URL)
