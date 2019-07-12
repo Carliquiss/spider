@@ -1,7 +1,18 @@
 import requests
 import sys
 import getopt
+import os
 from parsel import Selector
+
+
+PATH_LOCALES = "./URLS_locales"
+PATH_EXTERNAS = "./URLS_externas"
+
+def initFolders():
+    if os.path.exists(PATH_LOCALES) = False:
+        os.mkdir(PATH_LOCALES)
+    if os.path.exists(PATH_EXTERNAS) = False:
+        os.mkdir(PATH_EXTERNAS)
 
 
 
@@ -9,7 +20,7 @@ from parsel import Selector
 Funcion para clasificar los enlaces en locales o en externos según una URL dada
 
 Los parámetros son:
-    enlaces:lista: Conjunto de todos los enlaces a clasificar
+    enlaces:lista:  Conjunto de todos los enlaces a clasificar
     baseURL:string: URL a la que se hace el crawling
 """
 def selectLocalOrExternalLinks(enlaces, baseURL):
@@ -28,12 +39,16 @@ def selectLocalOrExternalLinks(enlaces, baseURL):
                 urlsExternas.append(enlace)
 
         else:
+            if(enlace[0] != "/"):
+                enlace = "/" + enlace
             urlsLocales.append("http://" + baseURL + enlace)
 
 
-
-
     return urlsLocales, urlsExternas
+
+
+
+
 
 """
 Función que toma una URL, selecciona todos los enlaces a páginas que encuentra
@@ -47,52 +62,72 @@ def getLinks(url):
     response = requests.get(url)
     selector = Selector(response.text)
     href_links = selector.xpath('//a/@href').getall()
-    print(*href_links, sep="\n")
 
     #Clasificamos los enlaces en externos o locales
     baseURL = url.split("/")[2]
-    (enlacesLocales, enlacesExternos) = selectLocalOrExternalLinks(href_links, baseURL)
+    return selectLocalOrExternalLinks(href_links, baseURL)
 
-    print("\n\nEnlaces locales: ")
-    print(*enlacesLocales, sep = "\n")
-    print("\n\nEnlaces externos: ")
-    print(*enlacesExternos,sep = "\n")
+
+
+
+
+"""
+Función para ir haciendo el crawling a las páginas encontradas
+
+Los parámetros son:
+    url:string:  Pagina a la que se quiere hacer el crawling de forma iterativa
+    modo:string: Local o Externo para hacer crawling solo a las webs locales
+                 o tambien a las externas.
+"""
+def CrawlerInsidersPages(url_principal, modo):
+    linksLocales, linksExternos = getLinks(url_principal)
+
+    if modo == "Local":
+        baseURL = url_principal.split("/")[2]
+        print(*linksLocales, sep = "\n", file=open(baseURL + "_URL_LOCALES.txt", "a"))
+        #print(*linksLocales, sep = "\n")
+
+    elif modo == "Externo":
+        print("Modo externo")
+
+    else:
+        print("Modo mixto")
+
 
 
 """
 Función principal donde se comprueban los parámetros de la función y
 se ejecutan las acciones acorde a estos.
 
-Los parámetros son
+Los parámetros son:
     -u <url> : URL (con http://) a la que se quiere hacer el crawling
-    -l : Si se quieren guardar solo los enlaces locales
-    -e : Si se quieren guardar solo los enlaces externos
+    -l       : Si se quieren guardar solo los enlaces locales
+    -e       : Si se quieren guardar solo los enlaces externos
 
 """
 def main():
     ## Configuramos los parametros que se puedan usar:
     URL = ''
-    local = False
-    externas = False
+    modo = ''
 
-    options, remainder = getopt.getopt(sys.argv[1:], 'u:leh',["url=","local=","externas","help"])
+    options, remainder = getopt.getopt(sys.argv[1:], 'u:leh',["url=","local=","externas=","help"])
 
     for opt, arg in options:
         if opt in ('-u', '--url'):
             URL = arg
         elif opt in ('-l', '--local'):
-            local = True
+            modo += 'Local'
         elif opt in ('-e', '--externas'):
-            externas = True
+            modo += 'Externo'
         elif opt in ('-h', '--help'):
             print('''Los parámetros son
                 -u <url> : URL (con http://) a la que se quiere hacer el crawling
-                -l : Si se quieren guardar solo los enlaces locales
-                -e : Si se quieren guardar solo los enlaces externos''')
+                -l       : Si se quieren guardar solo los enlaces locales
+                -e       : Si se quieren guardar solo los enlaces externos''')
 
 
     if(URL != ''):
-        getLinks(URL)
+        CrawlerInsidersPages(URL, modo)
 
 
 if __name__ == "__main__":
