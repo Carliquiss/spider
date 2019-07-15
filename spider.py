@@ -2,6 +2,8 @@ import requests
 import sys
 import getopt
 import os
+import shutil
+import glob
 from parsel import Selector
 from colorama import init, Fore, Back, Style
 from argparse import ArgumentParser
@@ -35,6 +37,38 @@ def initFolders():
     if os.path.exists(PATH_EXTERNAS) == False:
         os.mkdir(PATH_EXTERNAS)
 
+def clearFolders():
+    """
+    Función que elimina los archivos dentro de las carpetas
+    """
+
+    if os.path.exists(PATH_LOCALES) == True:
+        shutil.rmtree(PATH_LOCALES + "/")
+    if os.path.exists(PATH_EXTERNAS) == True:
+        shutil.rmtree(PATH_EXTERNAS + "/")
+
+    initFolders()
+
+
+
+def EliminarArchivosInnecesarios():
+    """
+    Función que elimina una serie de archivos creados que no hacen falta.
+    """
+    archivoslocales = glob.glob(PATH_LOCALES + "/*.txt")
+
+    for archivo in archivoslocales:
+        if(archivo[:-4][-1] != "_"):
+            os.remove(archivo)
+
+
+    archivosexternos = glob.glob(PATH_EXTERNAS + "/*.txt")
+
+    for archivo in archivosexternos:
+        if(archivo[:-4][-1] != "_"):
+            os.remove(archivo)
+
+
 
 def removeDuplicatedLines(nombre_archivo):
     """
@@ -48,14 +82,16 @@ def removeDuplicatedLines(nombre_archivo):
     """
     lineas_comprobadas = set()
     archivo = open(nombre_archivo[:-4] + "_.txt" , "w")
+
     for linea in open(nombre_archivo, "r"):
+
         if linea not in lineas_comprobadas:
             archivo.write(linea)
             lineas_comprobadas.add(linea)
 
 
     archivo.close()
-    os.remove(nombre_archivo)
+    #os.remove(nombre_archivo)
 
 
 def selectLocalOrExternalLinks(enlaces, baseURL):
@@ -82,9 +118,15 @@ def selectLocalOrExternalLinks(enlaces, baseURL):
                 urlsExternas.append(enlace)
 
         else:
-            if(enlace[0] != "/"):
-                enlace = "/" + enlace
-            urlsLocales.append("http://" + baseURL + enlace)
+            try:
+
+                if(enlace[0] != "/"):
+                    enlace = "/" + enlace
+                urlsLocales.append("http://" + baseURL + enlace)
+
+            except:
+                print("Hubo algun fallo en la URL (posiblemente URL en blanco)")
+                print("Esta sería la URL: " + str(enlace) + "\n")
 
 
     return urlsLocales, urlsExternas
@@ -100,20 +142,27 @@ def getLinks(url):
     Los parámetros son:
         url:string: Url a la que se quiere hacer el crawling
     """
-    #Accedemos a la páginas y nos quedamos con los href a otras urls
-    response = requests.get(url)
-    selector = Selector(response.text)
-    href_links = selector.xpath('//a/@href').getall()
+    try:
+        #Accedemos a la páginas y nos quedamos con los href a otras urls
+        response = requests.get(url)
+        selector = Selector(response.text)
+        href_links = selector.xpath('//a/@href').getall()
 
-    #Clasificamos los enlaces en externos o locales
-    baseURL = url.split("/")[2]
+        #Clasificamos los enlaces en externos o locales
+        baseURL = url.split("/")[2]
+
+    except:
+        print("Página no disponible")
+        href_links = ""
+        baseURL = ""
+
     return selectLocalOrExternalLinks(href_links, baseURL)
 
 
 
 
 
-def CrawlerInsidersPages(url_principal, modo):
+def CrawlPage(url_principal, modo):
     """
     Función para ir haciendo el crawling a las páginas encontradas
 
@@ -123,28 +172,62 @@ def CrawlerInsidersPages(url_principal, modo):
                      o tambien a las externas.
     """
 
-    linksLocales, linksExternos = getLinks(url_principal)
+    print(Fore.YELLOW + "Analizando: " +  url_principal)
 
-    print(Fore.MAGENTA + "Analizando: " +  url_principal + "\n")
+    linksLocales, linksExternos = getLinks(url_principal)
+    baseURL = url_principal.split("/")[2]
+    nombre_fichero = "/" + baseURL
+    #nombre_fichero = "/" + url_principal.replace("/", "_")
 
     if modo == "Local":
         print(Fore.RED + "------------- Modo Local -------------")
 
-        baseURL = url_principal.split("/")[2]
-        print(*linksLocales, sep = "\n", file=open(PATH_LOCALES + "/" + baseURL + "_URL_LOCALES.txt", "w"))
-        removeDuplicatedLines(PATH_LOCALES + "/" + baseURL + "_URL_LOCALES.txt")
+        print(*linksLocales, sep = "\n", file=open(PATH_LOCALES + nombre_fichero + "_URL_LOCALES.txt", "a"))
+        removeDuplicatedLines(PATH_LOCALES + nombre_fichero + "_URL_LOCALES.txt")
 
     elif modo == "Externo":
         print(Fore.RED + "------------- Modo Externo -------------")
 
-        baseURL = url_principal.split("/")[2]
-        print(*linksExternos, sep = "\n", file=open(PATH_EXTERNAS + "/" + baseURL + "_URL_EXTERNAS.txt", "w"))
-        removeDuplicatedLines(PATH_EXTERNAS + "/" + baseURL + "_URL_EXTERNAS.txt")
+        print(*linksExternos, sep = "\n", file=open(PATH_EXTERNAS + "/" + nombre_fichero + "_URL_EXTERNAS.txt", "a"))
+        removeDuplicatedLines(PATH_EXTERNAS + nombre_fichero + "_URL_EXTERNAS.txt")
 
     else:
-        print("Modo mixto, aun no funciona")
+        print(Fore.RED + "------------- Modo Mixto (Local + Externo) -------------")
+
+        print(*linksLocales, sep = "\n", file=open(PATH_LOCALES + nombre_fichero + "_URL_LOCALES.txt", "a"))
+        removeDuplicatedLines(PATH_LOCALES + nombre_fichero + "_URL_LOCALES.txt")
+
+        print(*linksExternos, sep = "\n", file=open(PATH_EXTERNAS + "/" + nombre_fichero + "_URL_EXTERNAS.txt", "a"))
+        removeDuplicatedLines(PATH_EXTERNAS + nombre_fichero + "_URL_EXTERNAS.txt")
 
 
+    print(Fore.CYAN + "Proceso terminado correctamente....\n\n")
+
+    return linksLocales, linksExternos
+
+
+def CrawlingIterative(Primera_url, modo):
+
+    #Aqui se debe poner de forma iterativa el crawling
+    enlacesLocales, enlacesExternos = CrawlPage(Primera_url, modo)
+
+    if modo == "Local":
+        for enlace in enlacesLocales:
+            CrawlPage(enlace, "Local")
+
+    elif modo == "Externo":
+        for enlace in enlacesExternos:
+            CrawlPage(enlace, "Local")
+            CrawlPage(enlace, "Externo")
+
+    else:
+        print("Modo mixto, por terminar")
+        for enlace in enlacesLocales:
+            CrawlPage(enlace, "Local")
+
+        for enlace in enlacesExternos:
+            CrawlPage(enlace, "Local")
+            CrawlPage(enlace, "Externo")
 
 def main():
     """
@@ -170,11 +253,19 @@ def main():
     argp.add_argument('-e', '--externas', action = 'store_true', default = False, dest = 'externas',
     help = 'Si se quiere analizar solo las url externas a la especificada')
 
+    argp.add_argument('-c', '--clean', action = 'store_true', default = False,
+        dest = 'clean', help = 'Limpiar las carpetas y archivos')
+
 
     argumentos = argp.parse_args()
-    print("La URL es: " + argumentos.url)
-    print("El estado de Local es: " + str(argumentos.local))
-    print("El estado de Externas es: " + str(argumentos.externas))
+    #print("La URL es: " + argumentos.url)
+    #print("El estado de Local es: " + str(argumentos.local))
+    #print("El estado de Externas es: " + str(argumentos.externas))
+
+
+    if argumentos.clean == True:
+        print("¿Limpiar carpetas?: " + str(argumentos.clean))
+        clearFolders()
 
     modo = ''
     if argumentos.local == True:
@@ -182,9 +273,12 @@ def main():
     if argumentos.externas == True:
         modo += 'Externo'
 
-
+    clearFolders()
     initFolders()
-    CrawlerInsidersPages(argumentos.url, modo)
+    CrawlingIterative(argumentos.url, modo)
+    EliminarArchivosInnecesarios()
+
+    #CrawlPage(argumentos.url, modo)
 
 
 
