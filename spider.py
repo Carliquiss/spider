@@ -3,17 +3,50 @@ import sys
 import getopt
 import os
 from parsel import Selector
+from colorama import init, Fore, Back, Style
 
 
+
+"""
+ __          __  _        _____                    _
+ \ \        / / | |      / ____|                  | |
+  \ \  /\  / /__| |__   | |     _ __ __ ___      _| | ___ _ __
+   \ \/  \/ / _ \ '_ \  | |    | '__/ _` \ \ /\ / / |/ _ \ '__|
+    \  /\  /  __/ |_) | | |____| | | (_| |\ V  V /| |  __/ |
+     \/  \/ \___|_.__/   \_____|_|  \__,_| \_/\_/ |_|\___|_|
+
+                                                    by: Carliquiss
+
+
+"""
+
+init(autoreset=True) # Para que los colores se reseten tras un print
 PATH_LOCALES = "./URLS_locales"
 PATH_EXTERNAS = "./URLS_externas"
 
 
 def initFolders():
-    if os.path.exists(PATH_LOCALES) = False:
+    """
+    Función para crear carpetas donde se guardan las URLs encontradas
+    """
+    if os.path.exists(PATH_LOCALES) == False:
         os.mkdir(PATH_LOCALES)
-    if os.path.exists(PATH_EXTERNAS) = False:
+    if os.path.exists(PATH_EXTERNAS) == False:
         os.mkdir(PATH_EXTERNAS)
+
+
+def removeDuplicatedLines(nombre_archivo):
+
+    lineas_comprobadas = set()
+    archivo = open(nombre_archivo[:-4] + "_.txt" , "w")
+    for linea in open(nombre_archivo, "r"):
+        if linea not in lineas_comprobadas:
+            archivo.write(linea)
+            lineas_comprobadas.add(linea)
+
+
+    archivo.close()
+    os.remove(nombre_archivo)
 
 
 def selectLocalOrExternalLinks(enlaces, baseURL):
@@ -27,6 +60,7 @@ def selectLocalOrExternalLinks(enlaces, baseURL):
 
     urlsLocales = []
     urlsExternas = []
+
     for enlace in enlaces:
 
         if(enlace.split("/")[0] == 'http:' or enlace.split("/")[0] == 'https:'):
@@ -45,8 +79,6 @@ def selectLocalOrExternalLinks(enlaces, baseURL):
 
 
     return urlsLocales, urlsExternas
-
-
 
 
 
@@ -72,7 +104,6 @@ def getLinks(url):
 
 
 
-
 def CrawlerInsidersPages(url_principal, modo):
     """
     Función para ir haciendo el crawling a las páginas encontradas
@@ -85,16 +116,24 @@ def CrawlerInsidersPages(url_principal, modo):
 
     linksLocales, linksExternos = getLinks(url_principal)
 
+    print(Fore.MAGENTA + "Analizando: " +  url_principal + "\n")
+
     if modo == "Local":
+        print(Fore.RED + "------------- Modo Local -------------")
+
         baseURL = url_principal.split("/")[2]
-        print(*linksLocales, sep = "\n", file=open(baseURL + "_URL_LOCALES.txt", "a"))
-        #print(*linksLocales, sep = "\n")
+        print(*linksLocales, sep = "\n", file=open(PATH_LOCALES + "/" + baseURL + "_URL_LOCALES.txt", "a"))
+        removeDuplicatedLines(PATH_LOCALES + "/" + baseURL + "_URL_LOCALES.txt")
 
     elif modo == "Externo":
-        print("Modo externo")
+        print(Fore.RED + "------------- Modo Externo -------------")
+
+        baseURL = url_principal.split("/")[2]
+        print(*linksExternos, sep = "\n", file=open(PATH_EXTERNAS + "/" + baseURL + "_URL_EXTERNAS.txt", "a"))
+        removeDuplicatedLines(PATH_EXTERNAS + "/" + baseURL + "_URL_EXTERNAS.txt")
 
     else:
-        print("Modo mixto")
+        print("Modo mixto, aun no funciona")
 
 
 
@@ -131,8 +170,20 @@ def main():
 
 
     if(URL != ''):
+        initFolders()
         CrawlerInsidersPages(URL, modo)
 
 
 if __name__ == "__main__":
+    print(Fore.GREEN + """
+     __          __  _        _____                    _
+     \ \        / / | |      / ____|                  | |
+      \ \  /\  / /__| |__   | |     _ __ __ ___      _| | ___ _ __
+       \ \/  \/ / _ \ '_ \  | |    | '__/ _` \ \ /\ / / |/ _ \ '__|
+        \  /\  /  __/ |_) | | |____| | | (_| |\ V  V /| |  __/ |
+         \/  \/ \___|_.__/   \_____|_|  \__,_| \_/\_/ |_|\___|_|
+
+
+    """)
+
     main()
