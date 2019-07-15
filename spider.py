@@ -8,6 +8,7 @@ from parsel import Selector
 PATH_LOCALES = "./URLS_locales"
 PATH_EXTERNAS = "./URLS_externas"
 
+
 def initFolders():
     if os.path.exists(PATH_LOCALES) = False:
         os.mkdir(PATH_LOCALES)
@@ -15,15 +16,14 @@ def initFolders():
         os.mkdir(PATH_EXTERNAS)
 
 
-
-"""
-Funcion para clasificar los enlaces en locales o en externos según una URL dada
-
-Los parámetros son:
-    enlaces:lista:  Conjunto de todos los enlaces a clasificar
-    baseURL:string: URL a la que se hace el crawling
-"""
 def selectLocalOrExternalLinks(enlaces, baseURL):
+    """
+    Funcion para clasificar los enlaces en locales o en externos según una URL dada
+
+    Los parámetros son:
+        enlaces:lista:  Conjunto de todos los enlaces a clasificar
+        baseURL:string: URL a la que se hace el crawling
+    """
 
     urlsLocales = []
     urlsExternas = []
@@ -50,14 +50,15 @@ def selectLocalOrExternalLinks(enlaces, baseURL):
 
 
 
-"""
-Función que toma una URL, selecciona todos los enlaces a páginas que encuentra
-y llama a la funcion para clasificarlos en externos o en locales
 
-Los parámetros son:
-    url:string: Url a la que se quiere hacer el crawling
-"""
 def getLinks(url):
+    """
+    Función que toma una URL, selecciona todos los enlaces a páginas que encuentra
+    y llama a la funcion para clasificarlos en externos o en locales
+
+    Los parámetros son:
+        url:string: Url a la que se quiere hacer el crawling
+    """
     #Accedemos a la páginas y nos quedamos con los href a otras urls
     response = requests.get(url)
     selector = Selector(response.text)
@@ -71,15 +72,17 @@ def getLinks(url):
 
 
 
-"""
-Función para ir haciendo el crawling a las páginas encontradas
 
-Los parámetros son:
-    url:string:  Pagina a la que se quiere hacer el crawling de forma iterativa
-    modo:string: Local o Externo para hacer crawling solo a las webs locales
-                 o tambien a las externas.
-"""
 def CrawlerInsidersPages(url_principal, modo):
+    """
+    Función para ir haciendo el crawling a las páginas encontradas
+
+    Los parámetros son:
+        url:string:  Pagina a la que se quiere hacer el crawling de forma iterativa
+        modo:string: Local o Externo para hacer crawling solo a las webs locales
+                     o tambien a las externas.
+    """
+
     linksLocales, linksExternos = getLinks(url_principal)
 
     if modo == "Local":
@@ -95,17 +98,18 @@ def CrawlerInsidersPages(url_principal, modo):
 
 
 
-"""
-Función principal donde se comprueban los parámetros de la función y
-se ejecutan las acciones acorde a estos.
 
-Los parámetros son:
-    -u <url> : URL (con http://) a la que se quiere hacer el crawling
-    -l       : Si se quieren guardar solo los enlaces locales
-    -e       : Si se quieren guardar solo los enlaces externos
-
-"""
 def main():
+    """
+    Función principal donde se comprueban los parámetros de la función y
+    se ejecutan las acciones acorde a estos.
+
+    Los parámetros son:
+        -u <url> : URL (con http://) a la que se quiere hacer el crawling
+        -l       : Si se quieren guardar solo los enlaces locales
+        -e       : Si se quieren guardar solo los enlaces externos
+
+    """
     ## Configuramos los parametros que se puedan usar:
     URL = ''
     modo = ''
