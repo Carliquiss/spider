@@ -147,6 +147,7 @@ def getLinks(url):
         response = requests.get(url)
         selector = Selector(response.text)
         href_links = selector.xpath('//a/@href').getall()
+        print(href_links)
 
         #Clasificamos los enlaces en externos o locales
         baseURL = url.split("/")[2]
@@ -182,23 +183,23 @@ def CrawlPage(url_principal, modo):
     if modo == "Local":
         print(Fore.RED + "------------- Modo Local -------------")
 
-        print(*linksLocales, sep = "\n", file=open(PATH_LOCALES + nombre_fichero + "_URL_LOCALES.txt", "a"))
-        removeDuplicatedLines(PATH_LOCALES + nombre_fichero + "_URL_LOCALES.txt")
+        print(*linksLocales, sep = "\n", file=open(PATH_LOCALES + nombre_fichero + ".txt", "a"))
+        removeDuplicatedLines(PATH_LOCALES + nombre_fichero + ".txt")
 
     elif modo == "Externo":
         print(Fore.RED + "------------- Modo Externo -------------")
 
-        print(*linksExternos, sep = "\n", file=open(PATH_EXTERNAS + "/" + nombre_fichero + "_URL_EXTERNAS.txt", "a"))
-        removeDuplicatedLines(PATH_EXTERNAS + nombre_fichero + "_URL_EXTERNAS.txt")
+        print(*linksExternos, sep = "\n", file=open(PATH_EXTERNAS + "/" + nombre_fichero + ".txt", "a"))
+        removeDuplicatedLines(PATH_EXTERNAS + nombre_fichero + ".txt")
 
     else:
         print(Fore.RED + "------------- Modo Mixto (Local + Externo) -------------")
 
-        print(*linksLocales, sep = "\n", file=open(PATH_LOCALES + nombre_fichero + "_URL_LOCALES.txt", "a"))
-        removeDuplicatedLines(PATH_LOCALES + nombre_fichero + "_URL_LOCALES.txt")
+        print(*linksLocales, sep = "\n", file=open(PATH_LOCALES + nombre_fichero + ".txt", "a"))
+        removeDuplicatedLines(PATH_LOCALES + nombre_fichero + ".txt")
 
-        print(*linksExternos, sep = "\n", file=open(PATH_EXTERNAS + "/" + nombre_fichero + "_URL_EXTERNAS.txt", "a"))
-        removeDuplicatedLines(PATH_EXTERNAS + nombre_fichero + "_URL_EXTERNAS.txt")
+        print(*linksExternos, sep = "\n", file=open(PATH_EXTERNAS + "/" + nombre_fichero + ".txt", "a"))
+        removeDuplicatedLines(PATH_EXTERNAS + nombre_fichero + ".txt")
 
 
     print(Fore.CYAN + "Proceso terminado correctamente....\n\n")
