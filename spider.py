@@ -4,6 +4,7 @@ import getopt
 import os
 from parsel import Selector
 from colorama import init, Fore, Back, Style
+from argparse import ArgumentParser
 
 
 
@@ -36,7 +37,15 @@ def initFolders():
 
 
 def removeDuplicatedLines(nombre_archivo):
+    """
+    Función para eliminar las lineas duplicadas dentro de un archivo
+    Se crea un archivo con el nombre del original + "_" y se elimina
+    el original.
 
+    Parámetros:
+        nombre_archivo:string: Nombre del archivo al que se le quieren
+                               eliminar las lineas duplicadas
+    """
     lineas_comprobadas = set()
     archivo = open(nombre_archivo[:-4] + "_.txt" , "w")
     for linea in open(nombre_archivo, "r"):
@@ -122,19 +131,18 @@ def CrawlerInsidersPages(url_principal, modo):
         print(Fore.RED + "------------- Modo Local -------------")
 
         baseURL = url_principal.split("/")[2]
-        print(*linksLocales, sep = "\n", file=open(PATH_LOCALES + "/" + baseURL + "_URL_LOCALES.txt", "a"))
+        print(*linksLocales, sep = "\n", file=open(PATH_LOCALES + "/" + baseURL + "_URL_LOCALES.txt", "w"))
         removeDuplicatedLines(PATH_LOCALES + "/" + baseURL + "_URL_LOCALES.txt")
 
     elif modo == "Externo":
         print(Fore.RED + "------------- Modo Externo -------------")
 
         baseURL = url_principal.split("/")[2]
-        print(*linksExternos, sep = "\n", file=open(PATH_EXTERNAS + "/" + baseURL + "_URL_EXTERNAS.txt", "a"))
+        print(*linksExternos, sep = "\n", file=open(PATH_EXTERNAS + "/" + baseURL + "_URL_EXTERNAS.txt", "w"))
         removeDuplicatedLines(PATH_EXTERNAS + "/" + baseURL + "_URL_EXTERNAS.txt")
 
     else:
         print("Modo mixto, aun no funciona")
-
 
 
 
@@ -147,31 +155,38 @@ def main():
         -u <url> : URL (con http://) a la que se quiere hacer el crawling
         -l       : Si se quieren guardar solo los enlaces locales
         -e       : Si se quieren guardar solo los enlaces externos
-
     """
-    ## Configuramos los parametros que se puedan usar:
-    URL = ''
+
+    url = ''
+
+    argp = ArgumentParser(description = "Crawler de páginas web")
+
+    argp.add_argument('-u', '--url', help = 'URL a la que se quiere hacer el crawling',
+        required = True)
+
+    argp.add_argument('-l', '--local', action = 'store_true', default = False, dest = 'local',
+        help = 'Si se quiere analizar solo las urls locales a la especificada')
+
+    argp.add_argument('-e', '--externas', action = 'store_true', default = False, dest = 'externas',
+    help = 'Si se quiere analizar solo las url externas a la especificada')
+
+
+    argumentos = argp.parse_args()
+    print("La URL es: " + argumentos.url)
+    print("El estado de Local es: " + str(argumentos.local))
+    print("El estado de Externas es: " + str(argumentos.externas))
+
     modo = ''
-
-    options, remainder = getopt.getopt(sys.argv[1:], 'u:leh',["url=","local=","externas=","help"])
-
-    for opt, arg in options:
-        if opt in ('-u', '--url'):
-            URL = arg
-        elif opt in ('-l', '--local'):
-            modo += 'Local'
-        elif opt in ('-e', '--externas'):
-            modo += 'Externo'
-        elif opt in ('-h', '--help'):
-            print('''Los parámetros son
-                -u <url> : URL (con http://) a la que se quiere hacer el crawling
-                -l       : Si se quieren guardar solo los enlaces locales
-                -e       : Si se quieren guardar solo los enlaces externos''')
+    if argumentos.local == True:
+        modo += 'Local'
+    if argumentos.externas == True:
+        modo += 'Externo'
 
 
-    if(URL != ''):
-        initFolders()
-        CrawlerInsidersPages(URL, modo)
+    initFolders()
+    CrawlerInsidersPages(argumentos.url, modo)
+
+
 
 
 if __name__ == "__main__":
