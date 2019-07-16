@@ -26,6 +26,7 @@ from argparse import ArgumentParser
 init(autoreset=True) # Para que los colores se reseten tras un print
 PATH_LOCALES = "./URLS_locales"
 PATH_EXTERNAS = "./URLS_externas"
+NIVEL_PROFUNDIDAD = 10 # Con qué nivel de profundidad se quiere escanear, más profundidad más tarda
 
 
 def initFolders():
@@ -147,7 +148,7 @@ def getLinks(url):
         response = requests.get(url)
         selector = Selector(response.text)
         href_links = selector.xpath('//a/@href').getall()
-        print(href_links)
+        #print(href_links)
 
         #Clasificamos los enlaces en externos o locales
         baseURL = url.split("/")[2]
@@ -193,7 +194,7 @@ def CrawlPage(url_principal, modo):
         removeDuplicatedLines(PATH_EXTERNAS + nombre_fichero + ".txt")
 
     else:
-        print(Fore.RED + "------------- Modo Mixto (Local + Externo) -------------")
+        print(Fore.RED + "------------- Mourldo Mixto (Local + Externo) -------------")
 
         print(*linksLocales, sep = "\n", file=open(PATH_LOCALES + nombre_fichero + ".txt", "a"))
         removeDuplicatedLines(PATH_LOCALES + nombre_fichero + ".txt")
@@ -211,24 +212,99 @@ def CrawlingIterative(Primera_url, modo):
 
     #Aqui se debe poner de forma iterativa el crawling
     enlacesLocales, enlacesExternos = CrawlPage(Primera_url, modo)
+    print("Numero de enlaces locales: " +  str(len(enlacesLocales)))
+
 
     if modo == "Local":
+        urls_por_visitar = {}
+
+        for i in range(NIVEL_PROFUNDIDAD):
+            urls_por_visitar[i] = []
+
+        print("Diccionario vació donde van a ir las URLs: ")
+        print(urls_por_visitar)
+
+        print("URLs locales de la URL dada: ")
+        urls_por_visitar[0].append(enlacesLocales)
+        print(urls_por_visitar[0][0])
+        print(len(urls_por_visitar[0][0]))
+
+        for i in range(len(urls_por_visitar[0][0])):
+            enlace = urls_por_visitar[0][0][i]
+            print("O" + enlace)
+            enlaces2, ext2 = CrawlPage(enlace, "Local")
+            urls_por_visitar[1].append(enlaces2)
+            print("HHHH" + urls_por_visitar[1][0][i])
+            print(len(urls_por_visitar[1][0][2]))
+
+            #print(urls_por_visitar[1][0])
+
+
+    #Se mete en todas las locales y las saca
+    if modo == "Prueba":
+        urls_por_visitar = {}
+
+        for i in range(NIVEL_PROFUNDIDAD):
+            urls_por_visitar [i] = []
+
+        urls_visitadas = set()
+
+        for i in range(NIVEL_PROFUNDIDAD):
+
+            urls_por_visitar[i].append(enlacesLocales)
+
+            numero_enlace = 0
+            print("URLs a hacer crawling para nivel: " + str(i))
+            print("Numero de enlaces nivel 1: " + str(len(urls_por_visitar[i])))
+            print(urls_por_visitar[i][numero_enlace])
+
+            for i in range(len(urls_por_visitar[i])):
+                print("URL: " + urls_por_visitar[i])
+                print("Numero de enlaces de nivel 2: " + len(urls_por_visitar[1][i]))
+
+            print("__________________________________________")
+
+
+            for enlace in urls_por_visitar[i][numero_enlace]:
+                print("El enlace es: ")
+                print(enlace)
+                print("____________________________-")
+
+                if enlace not in urls_visitadas:
+                    urls_visitadas.add(enlace)
+                    enlacesLocl, enlacesExt = CrawlPage(enlace, "Local")
+                    urls_por_visitar[i+1].append(enlacesLocl)
+
+                numero_enlace += 1
+
+
+            #Aqui se supone que se ha escaneado el primer nivel
+
+
+    if modo == "Externo":
         for enlace in enlacesLocales:
-            CrawlPage(enlace, "Local")
+            enlaces_locales, enlaces_externos = CrawlPage(enlace, "Local")
 
-    elif modo == "Externo":
-        for enlace in enlacesExternos:
-            CrawlPage(enlace, "Local")
-            CrawlPage(enlace, "Externo")
+            for enlace_externo in enlaces_locales:
+                CrawlPage(enlace_externo, "Externo")
 
-    else:
-        print("Modo mixto, por terminar")
-        for enlace in enlacesLocales:
-            CrawlPage(enlace, "Local")
-
-        for enlace in enlacesExternos:
-            CrawlPage(enlace, "Local")
-            CrawlPage(enlace, "Externo")
+#    if modo == "Local":
+#        for enlace in enlacesLocales:
+#            CrawlPage(enlace, "Local")
+#
+#    elif modo == "Externo":
+#        for enlace in enlacesExternos:
+#            CrawlPage(enlace, "Local")
+#            CrawlPage(enlace, "Externo")
+#
+#    else:
+#        print("Modo mixto, por terminar")
+#        for enlace in enlacesLocales:
+#            CrawlPage(enlace, "Local")
+#
+#        for enlace in enlacesExternos:
+#            CrawlPage(enlace, "Local")
+#            CrawlPage(enlace, "Externo")
 
 def main():
     """
