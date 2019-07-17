@@ -26,7 +26,7 @@ from argparse import ArgumentParser
 init(autoreset=True) # Para que los colores se reseten tras un print
 PATH_LOCALES = "./URLS_locales"
 PATH_EXTERNAS = "./URLS_externas"
-NIVEL_PROFUNDIDAD = 10 # Con qué nivel de profundidad se quiere escanear, más profundidad más tarda
+NIVEL_PROFUNDIDAD = 50 # Con qué nivel de profundidad se quiere escanear, más profundidad más tarda
 
 
 def initFolders():
@@ -122,6 +122,7 @@ def selectLocalOrExternalLinks(enlaces, baseURL):
             try:
 
                 if(enlace[0] != "/"):
+                    print("Full enlace: " + enlace)
                     enlace = "/" + enlace
                 urlsLocales.append("http://" + baseURL + enlace)
 
@@ -215,7 +216,7 @@ def CrawlingIterative(Primera_url, modo):
     print("Numero de enlaces locales: " +  str(len(enlacesLocales)))
 
 
-    if modo == "Local":
+    if modo == "Testing_Local":
         urls_por_visitar = {}
 
         for i in range(NIVEL_PROFUNDIDAD):
@@ -229,57 +230,57 @@ def CrawlingIterative(Primera_url, modo):
         print(urls_por_visitar[0][0])
         print(len(urls_por_visitar[0][0]))
 
+        #Primer nivel:
         for i in range(len(urls_por_visitar[0][0])):
             enlace = urls_por_visitar[0][0][i]
-            print("O" + enlace)
+            print("O --> " + enlace)
             enlaces2, ext2 = CrawlPage(enlace, "Local")
             urls_por_visitar[1].append(enlaces2)
-            print("HHHH" + urls_por_visitar[1][0][i])
-            print(len(urls_por_visitar[1][0][2]))
+            print("HHHH ---> " + urls_por_visitar[1][0][i])
+            print("Longitud: " + str(len(urls_por_visitar[1][i])))
+
+
+        for j in range(len(urls_por_visitar[1])):
+
+            for e in range(len(urls_por_visitar[1][j])):
+                enlace = urls_por_visitar[1][j][e]
+                enlaces2, ext2 = CrawlPage(enlace, "Local")
+                urls_por_visitar[2].append(enlaces2)
+
+        print("Longitud del nivel 2: " + str(len(urls_por_visitar[2])))
+        print(urls_por_visitar[2])
+
+
+
 
             #print(urls_por_visitar[1][0])
 
 
     #Se mete en todas las locales y las saca
-    if modo == "Prueba":
+    if modo == "Local":
         urls_por_visitar = {}
+        enlaces_visitados = []
 
         for i in range(NIVEL_PROFUNDIDAD):
-            urls_por_visitar [i] = []
+            urls_por_visitar[i] = []
 
-        urls_visitadas = set()
+        urls_por_visitar[0].append(enlacesLocales) #Primer Crawl
 
-        for i in range(NIVEL_PROFUNDIDAD):
+        for nivel in range(NIVEL_PROFUNDIDAD-1):
 
-            urls_por_visitar[i].append(enlacesLocales)
+            for posicion in range(len(urls_por_visitar[nivel])):
 
-            numero_enlace = 0
-            print("URLs a hacer crawling para nivel: " + str(i))
-            print("Numero de enlaces nivel 1: " + str(len(urls_por_visitar[i])))
-            print(urls_por_visitar[i][numero_enlace])
+                for num_enlace in range(len(urls_por_visitar[nivel][posicion])):
+                    enlace = urls_por_visitar[nivel][posicion][num_enlace]
 
-            for i in range(len(urls_por_visitar[i])):
-                print("URL: " + urls_por_visitar[i])
-                print("Numero de enlaces de nivel 2: " + len(urls_por_visitar[1][i]))
+                    if enlace not in enlaces_visitados:
+                        enlaces_visitados.append(enlace)
+                        enlaces2, ext2 = CrawlPage(enlace, "Local")
+                        urls_por_visitar[nivel+1].append(enlaces2)
 
-            print("__________________________________________")
-
-
-            for enlace in urls_por_visitar[i][numero_enlace]:
-                print("El enlace es: ")
-                print(enlace)
-                print("____________________________-")
-
-                if enlace not in urls_visitadas:
-                    urls_visitadas.add(enlace)
-                    enlacesLocl, enlacesExt = CrawlPage(enlace, "Local")
-                    urls_por_visitar[i+1].append(enlacesLocl)
-
-                numero_enlace += 1
-
-
-            #Aqui se supone que se ha escaneado el primer nivel
-
+        archivo = open("urls_visitadas.txt", "w")
+        for linea in enlaces_visitados:
+            archivo.write(linea + "\n")
 
     if modo == "Externo":
         for enlace in enlacesLocales:
