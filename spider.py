@@ -157,17 +157,19 @@ def getLinks(url):
     try:
         #Accedemos a la páginas y nos quedamos con los href a otras urls
         response = requests.get(url)
-        selector = Selector(response.text)
-        href_links = selector.xpath('//a/@href').getall()
-        #print(href_links)
+        tipo_archivo = response.headers.get('content-type')
 
-        #Clasificamos los enlaces en externos o locales
-        baseURL = url.split("/")[2]
+        if "text/" in tipo_archivo:
+            selector = Selector(response.text)
+            href_links = selector.xpath('//a/@href').getall()
+
+        else:
+            print("Archivo diferente a texto")
+            href_links = ""
 
     except:
         print("Página no disponible")
         href_links = ""
-        baseURL = ""
 
     return selectLocalOrExternalLinks(href_links, url)
 
@@ -184,16 +186,10 @@ def CrawlPage(url_principal, modo):
                      o tambien a las externas.
     """
 
-    print(Fore.YELLOW + "\n\n\nAnalizando: " +  url_principal)
+    print(Fore.YELLOW + "\nAnalizando: " +  url_principal)
 
 
     #nombre_fichero = "/" + url_principal.replace("/", "_")
-
-    if (url_principal.split(".")[-1].upper() == "PDF" or url_principal.split(".")[-1].upper() == "ZIP"):
-        print("Archivo PDF o ZIP")
-
-        return "", ""
-
     baseURL = url_principal.split("/")[2]
     nombre_fichero = "/" + baseURL
     linksLocales, linksExternos = getLinks(url_principal)
