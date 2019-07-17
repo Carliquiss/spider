@@ -26,7 +26,7 @@ from argparse import ArgumentParser
 init(autoreset=True) # Para que los colores se reseten tras un print
 PATH_LOCALES = "./URLS_locales"
 PATH_EXTERNAS = "./URLS_externas"
-NIVEL_PROFUNDIDAD = 50 # Con qué nivel de profundidad se quiere escanear, más profundidad más tarda
+NIVEL_PROFUNDIDAD = 100 # Con qué nivel de profundidad se quiere escanear, más profundidad más tarda
 
 
 def initFolders():
@@ -95,7 +95,7 @@ def removeDuplicatedLines(nombre_archivo):
     #os.remove(nombre_archivo)
 
 
-def selectLocalOrExternalLinks(enlaces, baseURL):
+def selectLocalOrExternalLinks(enlaces, url):
     """
     Funcion para clasificar los enlaces en locales o en externos según una URL dada
 
@@ -106,6 +106,7 @@ def selectLocalOrExternalLinks(enlaces, baseURL):
 
     urlsLocales = []
     urlsExternas = []
+    baseURL = url.split("/")[2]
 
     for enlace in enlaces:
 
@@ -122,9 +123,18 @@ def selectLocalOrExternalLinks(enlaces, baseURL):
             try:
 
                 if(enlace[0] != "/"):
-                    print("Full enlace: " + enlace)
-                    enlace = "/" + enlace
-                urlsLocales.append("http://" + baseURL + enlace)
+                    if(enlace[0] == "."):
+                        trozo_url = url.rsplit("/", 1)[0]
+                        enlace = trozo_url + enlace[1::]
+                        urlsLocales.append(enlace)
+                        print("La url original es: " + url)
+                        print("La modificada: " + enlace)
+                    else:
+                        enlace = "/" + enlace
+                        urlsLocales.append("http://" + baseURL + enlace)
+                else:
+
+                    urlsLocales.append("http://" + baseURL + enlace)
 
             except:
                 print("Hubo algun fallo en la URL (posiblemente URL en blanco)")
@@ -159,8 +169,7 @@ def getLinks(url):
         href_links = ""
         baseURL = ""
 
-    return selectLocalOrExternalLinks(href_links, baseURL)
-
+    return selectLocalOrExternalLinks(href_links, url)
 
 
 
@@ -175,12 +184,20 @@ def CrawlPage(url_principal, modo):
                      o tambien a las externas.
     """
 
-    print(Fore.YELLOW + "Analizando: " +  url_principal)
+    print(Fore.YELLOW + "\n\n\nAnalizando: " +  url_principal)
 
-    linksLocales, linksExternos = getLinks(url_principal)
+
+    #nombre_fichero = "/" + url_principal.replace("/", "_")
+
+    if (url_principal.split(".")[-1].upper() == "PDF" or url_principal.split(".")[-1].upper() == "ZIP"):
+        print("Archivo PDF o ZIP")
+
+        return "", ""
+
     baseURL = url_principal.split("/")[2]
     nombre_fichero = "/" + baseURL
-    #nombre_fichero = "/" + url_principal.replace("/", "_")
+    linksLocales, linksExternos = getLinks(url_principal)
+
 
     if modo == "Local":
         print(Fore.RED + "------------- Modo Local -------------")
@@ -213,48 +230,6 @@ def CrawlingIterative(Primera_url, modo):
 
     #Aqui se debe poner de forma iterativa el crawling
     enlacesLocales, enlacesExternos = CrawlPage(Primera_url, modo)
-    print("Numero de enlaces locales: " +  str(len(enlacesLocales)))
-
-
-    if modo == "Testing_Local":
-        urls_por_visitar = {}
-
-        for i in range(NIVEL_PROFUNDIDAD):
-            urls_por_visitar[i] = []
-
-        print("Diccionario vació donde van a ir las URLs: ")
-        print(urls_por_visitar)
-
-        print("URLs locales de la URL dada: ")
-        urls_por_visitar[0].append(enlacesLocales)
-        print(urls_por_visitar[0][0])
-        print(len(urls_por_visitar[0][0]))
-
-        #Primer nivel:
-        for i in range(len(urls_por_visitar[0][0])):
-            enlace = urls_por_visitar[0][0][i]
-            print("O --> " + enlace)
-            enlaces2, ext2 = CrawlPage(enlace, "Local")
-            urls_por_visitar[1].append(enlaces2)
-            print("HHHH ---> " + urls_por_visitar[1][0][i])
-            print("Longitud: " + str(len(urls_por_visitar[1][i])))
-
-
-        for j in range(len(urls_por_visitar[1])):
-
-            for e in range(len(urls_por_visitar[1][j])):
-                enlace = urls_por_visitar[1][j][e]
-                enlaces2, ext2 = CrawlPage(enlace, "Local")
-                urls_por_visitar[2].append(enlaces2)
-
-        print("Longitud del nivel 2: " + str(len(urls_por_visitar[2])))
-        print(urls_por_visitar[2])
-
-
-
-
-            #print(urls_por_visitar[1][0])
-
 
     #Se mete en todas las locales y las saca
     if modo == "Local":
@@ -266,7 +241,7 @@ def CrawlingIterative(Primera_url, modo):
 
         urls_por_visitar[0].append(enlacesLocales) #Primer Crawl
 
-        for nivel in range(NIVEL_PROFUNDIDAD-1):
+        for nivel in range(NIVEL_PROFUNDIDAD):
 
             for posicion in range(len(urls_por_visitar[nivel])):
 
@@ -282,30 +257,10 @@ def CrawlingIterative(Primera_url, modo):
         for linea in enlaces_visitados:
             archivo.write(linea + "\n")
 
+
     if modo == "Externo":
-        for enlace in enlacesLocales:
-            enlaces_locales, enlaces_externos = CrawlPage(enlace, "Local")
+        print("Por definir")
 
-            for enlace_externo in enlaces_locales:
-                CrawlPage(enlace_externo, "Externo")
-
-#    if modo == "Local":
-#        for enlace in enlacesLocales:
-#            CrawlPage(enlace, "Local")
-#
-#    elif modo == "Externo":
-#        for enlace in enlacesExternos:
-#            CrawlPage(enlace, "Local")
-#            CrawlPage(enlace, "Externo")
-#
-#    else:
-#        print("Modo mixto, por terminar")
-#        for enlace in enlacesLocales:
-#            CrawlPage(enlace, "Local")
-#
-#        for enlace in enlacesExternos:
-#            CrawlPage(enlace, "Local")
-#            CrawlPage(enlace, "Externo")
 
 def main():
     """
