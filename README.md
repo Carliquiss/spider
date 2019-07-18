@@ -26,7 +26,7 @@ python spider.py -u <url> -l
 ```
 You can also use the "-c" param to clear all folders and files created by the crawler 
 ```
-python spider.py -u <url> -l
+python spider.py -u <url> -l -c
 ```
  Or
 ```
