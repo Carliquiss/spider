@@ -322,7 +322,7 @@ def main():
     EliminarArchivosInnecesarios()
 
 
-    print(Fore.LIGHTMAGENTA_EX + "El programa ha tardado: " + str(datetime.timedelta(time.time() - startTime)))
+    print(Fore.LIGHTMAGENTA_EX + "El programa ha tardado: " + str(time.time() - startTime) + " segundos")
     print("Se han escaneado: " + str(NumeroURLS) + " URLs")
 
 
