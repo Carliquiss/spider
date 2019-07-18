@@ -21,7 +21,6 @@ from argparse import ArgumentParser
 
                                                     by: Carliquiss
 
-
 """
 
 init(autoreset=True) # Para que los colores se reseten tras un print
@@ -38,6 +37,7 @@ def initFolders():
         os.mkdir(PATH_LOCALES)
     if os.path.exists(PATH_EXTERNAS) == False:
         os.mkdir(PATH_EXTERNAS)
+
 
 def clearFolders():
     """
@@ -270,8 +270,6 @@ def CrawlingIterative(Primera_url, modo):
         #archivo = open("urls_visitadas.txt", "w")
         #for linea in enlaces_visitados:
         #    archivo.write(linea + "\n")
-
-
 
 
     if modo == "Externo":
