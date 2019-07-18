@@ -158,7 +158,7 @@ def getLinks(url):
     """
     try:
         #Accedemos a la páginas y nos quedamos con los href a otras urls
-        if (url.split(".")[-1]).upper() == "PDF" or (url.split(".")[-1]).upper() == "ZIP":
+        if (url.split(".")[-1]).upper() == "PDF" or (url.split(".")[-1]).upper() == "ZIP" or (url.split("?")[-1]).upper() == "THEME=PDF":
             tipo_archivo = ""
             href_links = ""
 
@@ -267,12 +267,32 @@ def CrawlingIterative(Primera_url, modo):
         #for linea in enlaces_visitados:
         #    archivo.write(linea + "\n")
 
-        return len(enlaces_visitados)
+
 
 
     if modo == "Externo":
-        print("Por definir")
+        print("En proceso de que funcione")
+        urls_por_visitar = {}
+        enlaces_visitados = []
 
+        for i in range(NIVEL_PROFUNDIDAD):
+            urls_por_visitar[i] = []
+
+        urls_por_visitar[0].append(enlacesExternos) #Primer Crawl
+
+        for nivel in range(NIVEL_PROFUNDIDAD-1):
+
+            for posicion in range(len(urls_por_visitar[nivel])):
+
+                for num_enlace in range(len(urls_por_visitar[nivel][posicion])):
+                    enlace = urls_por_visitar[nivel][posicion][num_enlace]
+
+                    if enlace not in enlaces_visitados:
+                        enlaces_visitados.append(enlace)
+                        enlaces2, ext2 = CrawlPage(enlace, "Local")
+                        urls_por_visitar[nivel+1].append(ext2)
+
+    return len(enlaces_visitados)
 
 def main():
     """
