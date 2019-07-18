@@ -1,6 +1,5 @@
 requests
-getopt
-glob
+glob2
 parsel
 colorama
 argparse

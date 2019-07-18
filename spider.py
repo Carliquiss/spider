@@ -1,6 +1,5 @@
 import requests
 import sys
-import getopt
 import os
 import shutil
 import glob
