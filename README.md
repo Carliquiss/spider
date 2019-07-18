@@ -3,14 +3,18 @@ _Web crawler to look for local or external links from an especified URL_
 
 
 
-## Installing - Instalación 🚀
+## Installing 🔧
 Run the following command to install needed libs:
 ```
 pip install -r requirements.txt
 ```
 
-## Usage ⚙️
-The URL is givem by the -u param: -u <url>  
+
+## How does it works ⚙️
+
+## Usage ⌨️
+The URL is givem by the "-u" param: -u url  
+  
 If you want to crawl that URL for looking for local links just use the "-l" option: 
 ```
 python spider.py -u <url> -l
