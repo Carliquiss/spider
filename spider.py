@@ -208,6 +208,10 @@ def CrawlPage(url_principal, modo):
         print(*linksLocales, sep = "\n", file=open(PATH_LOCALES + nombre_fichero + ".txt", "a"))
         removeDuplicatedLines(PATH_LOCALES + nombre_fichero + ".txt")
 
+        #Prueba a ver si se van guardando tb en los linksExternos
+        print(*linksExternos, sep = "\n", file=open(PATH_EXTERNAS + "/" + nombre_fichero + ".txt", "a"))
+        removeDuplicatedLines(PATH_EXTERNAS + nombre_fichero + ".txt")
+
     elif modo == "Externo":
         print(Fore.RED + "------------- Modo Externo -------------")
 
@@ -289,7 +293,7 @@ def CrawlingIterative(Primera_url, modo):
 
                     if enlace not in enlaces_visitados:
                         enlaces_visitados.append(enlace)
-                        enlaces2, ext2 = CrawlPage(enlace, "Local")
+                        enlaces2, ext2 = CrawlPage(enlace, "Externo")
                         urls_por_visitar[nivel+1].append(ext2)
 
     return len(enlaces_visitados)
