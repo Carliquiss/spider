@@ -158,7 +158,7 @@ def getLinks(url):
     """
     try:
         #Accedemos a la páginas y nos quedamos con los href a otras urls
-        if (url.split(".")[-1]).upper() == "PDF":
+        if (url.split(".")[-1]).upper() == "PDF" or (url.split(".")[-1]).upper() == "ZIP":
             tipo_archivo = ""
             href_links = ""
 
