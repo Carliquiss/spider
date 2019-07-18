@@ -1,0 +1,6 @@
+requests
+getopt
+glob
+parsel
+colorama
+argparse

@@ -4,6 +4,8 @@ import getopt
 import os
 import shutil
 import glob
+import time
+import datetime
 from parsel import Selector
 from colorama import init, Fore, Back, Style
 from argparse import ArgumentParser
@@ -121,14 +123,15 @@ def selectLocalOrExternalLinks(enlaces, url):
 
         else:
             try:
-
+                #Si el enlace comienza con / es que depende de la URL base
                 if(enlace[0] != "/"):
+                    #Si el enlace obtenido comienza con "." es que depende de
+                    #la URL anterior
                     if(enlace[0] == "."):
                         trozo_url = url.rsplit("/", 1)[0]
                         enlace = trozo_url + enlace[1::]
                         urlsLocales.append(enlace)
-                        print("La url original es: " + url)
-                        print("La modificada: " + enlace)
+
                     else:
                         enlace = "/" + enlace
                         urlsLocales.append("http://" + baseURL + enlace)
@@ -156,15 +159,21 @@ def getLinks(url):
     """
     try:
         #Accedemos a la páginas y nos quedamos con los href a otras urls
-        response = requests.get(url)
-        tipo_archivo = response.headers.get('content-type')
+        if (url.split(".")[-1]).upper() == "PDF":
+            tipo_archivo = ""
+            href_links = ""
+
+        else:
+
+            response = requests.get(url, timeout = 5)
+            tipo_archivo = response.headers.get('content-type')
 
         if "text/" in tipo_archivo:
             selector = Selector(response.text)
             href_links = selector.xpath('//a/@href').getall()
 
         else:
-            print("Archivo diferente a texto")
+            #print("Archivo diferente a texto")
             href_links = ""
 
     except:
@@ -187,7 +196,6 @@ def CrawlPage(url_principal, modo):
     """
 
     print(Fore.YELLOW + "\nAnalizando: " +  url_principal)
-
 
     #nombre_fichero = "/" + url_principal.replace("/", "_")
     baseURL = url_principal.split("/")[2]
@@ -223,6 +231,13 @@ def CrawlPage(url_principal, modo):
 
 
 def CrawlingIterative(Primera_url, modo):
+    """
+    Función que hace el crawling a la url especificada de forma iterativa.
+
+    Los parámetros son:
+        Primera_url:string: URL que se va a crawlear de forma iterativa
+        modo:str: Puede ser Local o Externo
+    """
 
     #Aqui se debe poner de forma iterativa el crawling
     enlacesLocales, enlacesExternos = CrawlPage(Primera_url, modo)
@@ -237,7 +252,7 @@ def CrawlingIterative(Primera_url, modo):
 
         urls_por_visitar[0].append(enlacesLocales) #Primer Crawl
 
-        for nivel in range(NIVEL_PROFUNDIDAD):
+        for nivel in range(NIVEL_PROFUNDIDAD-1):
 
             for posicion in range(len(urls_por_visitar[nivel])):
 
@@ -249,9 +264,11 @@ def CrawlingIterative(Primera_url, modo):
                         enlaces2, ext2 = CrawlPage(enlace, "Local")
                         urls_por_visitar[nivel+1].append(enlaces2)
 
-        archivo = open("urls_visitadas.txt", "w")
-        for linea in enlaces_visitados:
-            archivo.write(linea + "\n")
+        #archivo = open("urls_visitadas.txt", "w")
+        #for linea in enlaces_visitados:
+        #    archivo.write(linea + "\n")
+
+        return len(enlaces_visitados)
 
 
     if modo == "Externo":
@@ -287,13 +304,9 @@ def main():
 
 
     argumentos = argp.parse_args()
-    #print("La URL es: " + argumentos.url)
-    #print("El estado de Local es: " + str(argumentos.local))
-    #print("El estado de Externas es: " + str(argumentos.externas))
 
 
     if argumentos.clean == True:
-        print("¿Limpiar carpetas?: " + str(argumentos.clean))
         clearFolders()
 
     modo = ''
@@ -302,13 +315,15 @@ def main():
     if argumentos.externas == True:
         modo += 'Externo'
 
-    clearFolders()
+    NumeroURLS = 0
     initFolders()
-    CrawlingIterative(argumentos.url, modo)
+    startTime = time.time()
+    NumeroURLS = CrawlingIterative(argumentos.url, modo)
     EliminarArchivosInnecesarios()
 
-    #CrawlPage(argumentos.url, modo)
 
+    print(Fore.LIGHTMAGENTA_EX + "El programa ha tardado: " + str(datetime.timedelta(time.time() - startTime)))
+    print("Se han escaneado: " + str(NumeroURLS) + " URLs")
 
 
 

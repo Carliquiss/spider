@@ -1,7 +1,0 @@
-Que tenga modo verbose, modo para pasarle las listas, por defecto que saque las url locales
-y si se lo indicas con -e que saque las remotas.
-
-Probar con algun departamento pequeño
-
-
-Tuto: https://codeburst.io/web-crawling-and-scraping-in-python-7116b16d27c7
