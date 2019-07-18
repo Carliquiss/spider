@@ -20,7 +20,7 @@ pip install -r requirements.txt
 ```
 
 ## Usage ⌨️
-The URL is givem by the "-u" param: -u url  
+The URL is givem by the "-u" param: -u url (in format http://www.example.com)
   
 If you want to crawl that URL for looking for local links just use the "-l" option: 
 ```
