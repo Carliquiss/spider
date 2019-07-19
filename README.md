@@ -31,7 +31,7 @@ You can also use the "-c" param to clear all folders and files created by the cr
 python spider.py -u <url> -c
 ```
 This also save the externasl URLs from the local links under the "URLS_externas" folder.    
-If you want to get the urls from a file just use "-i input_file":
+  If you want to get the urls from a file just use "-i input_file":
 ```
 python spider.py -i <input_file>
 ```
