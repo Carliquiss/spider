@@ -362,8 +362,7 @@ def main():
             urls_analizadas = set()
 
             for linea in lineas:
-
-                if linea.split("/")[0] == "http:" or argumentos.url.split("/")[0] == "https:":
+                if linea.split("/")[0] == "http:" or linea.split("/")[0] == "https:":
                     print(Fore.GREEN + "URL okey")
 
                 else:
