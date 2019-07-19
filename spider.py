@@ -282,9 +282,10 @@ def main():
     se ejecutan las acciones acorde a estos.
 
     Los parámetros son:
-        -u <url> : URL (con http://) a la que se quiere hacer el crawling
-        -i <input_file>      : Si se quieren leer urls de un archivo
-        -c       : Si se quieren guardar solo los enlaces externos
+        -u <url>            : URL (con http://) a la que se quiere hacer el crawling
+        -i <input_file>     : Si se quieren leer urls de un archivo
+        -c                  : Si se quieren guardar solo los enlaces externos
+        -v                  : Activar el modo verboso
 
     """
 
