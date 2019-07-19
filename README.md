@@ -44,7 +44,7 @@ Or
 python spider.py -u <url> -v
 ```
 ```
-python spider.py -u <url> -cv
+python spider.py -i <input_file> -cv
 ```
 
 
