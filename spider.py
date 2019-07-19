@@ -227,20 +227,12 @@ def CrawlPage(url_principal, modo):
     elif modo == "Externo":
         print(Fore.RED + "------------- Modo Externo -------------")
 
-        print(*linksExternos, sep = "\n", file=open(PATH_EXTERNAS + "/" + nombre_fichero + ".txt", "a"))
-        removeDuplicatedLines(PATH_EXTERNAS + nombre_fichero + ".txt")
-
     else:
-        print(Fore.RED + "------------- Mourldo Mixto (Local + Externo) -------------")
-
-        print(*linksLocales, sep = "\n", file=open(PATH_LOCALES + nombre_fichero + ".txt", "a"))
-        removeDuplicatedLines(PATH_LOCALES + nombre_fichero + ".txt")
-
-        print(*linksExternos, sep = "\n", file=open(PATH_EXTERNAS + "/" + nombre_fichero + ".txt", "a"))
-        removeDuplicatedLines(PATH_EXTERNAS + nombre_fichero + ".txt")
+        print(Fore.RED + "------------- Modo Mixto (Local + Externo) -------------")
+        #Este modo pasará a ser el modo Default, implementado ahora en local
 
 
-    print(Fore.CYAN + "Proceso terminado correctamente....\n\n")
+    print(Fore.GREEN + "Proceso terminado correctamente....\n\n")
 
     return linksLocales, linksExternos
 
@@ -251,7 +243,7 @@ def CrawlingIterative(Primera_url, modo):
 
     Los parámetros son:
         Primera_url:string: URL que se va a crawlear de forma iterativa
-        modo:str: Puede ser Local o Externo
+        modo:str: Puede ser Local o Lista
     """
 
     #Aqui se debe poner de forma iterativa el crawling
@@ -279,32 +271,6 @@ def CrawlingIterative(Primera_url, modo):
                         enlaces2, ext2 = CrawlPage(enlace, "Local")
                         urls_por_visitar[nivel+1].append(enlaces2)
 
-        #archivo = open("urls_visitadas.txt", "w")
-        #for linea in enlaces_visitados:
-        #    archivo.write(linea + "\n")
-
-
-    if modo == "Externo":
-        print("En proceso de que funcione")
-        urls_por_visitar = {}
-        enlaces_visitados = []
-
-        for i in range(NIVEL_PROFUNDIDAD):
-            urls_por_visitar[i] = []
-
-        urls_por_visitar[0].append(enlacesExternos) #Primer Crawl
-
-        for nivel in range(NIVEL_PROFUNDIDAD-1):
-
-            for posicion in range(len(urls_por_visitar[nivel])):
-
-                for num_enlace in range(len(urls_por_visitar[nivel][posicion])):
-                    enlace = urls_por_visitar[nivel][posicion][num_enlace]
-
-                    if enlace not in enlaces_visitados:
-                        enlaces_visitados.append(enlace)
-                        enlaces2, ext2 = CrawlPage(enlace, "Externo")
-                        urls_por_visitar[nivel+1].append(ext2)
 
     return len(enlaces_visitados)
 
@@ -315,8 +281,8 @@ def main():
 
     Los parámetros son:
         -u <url> : URL (con http://) a la que se quiere hacer el crawling
-        -l       : Si se quieren guardar solo los enlaces locales
-        -e       : Si se quieren guardar solo los enlaces externos
+        -i <input_file>      : Si se quieren leer urls de un archivo
+        -c       : Se quieren limpiar las carpetas con los archivos de los escaneos
     """
 
     url = ''
@@ -326,11 +292,8 @@ def main():
     argp.add_argument('-u', '--url', help = 'URL a la que se quiere hacer el crawling',
         required = True)
 
-    argp.add_argument('-l', '--local', action = 'store_true', default = False, dest = 'local',
-        help = 'Si se quiere analizar solo las urls locales a la especificada')
-
-    argp.add_argument('-e', '--externas', action = 'store_true', default = False, dest = 'externas',
-    help = 'Si se quiere analizar solo las url externas a la especificada')
+    argp.add_argument('-i', '--input_file', action = 'store_true', default = False, dest = 'list',
+        help = 'Si se quiere indicar una lista de urls')
 
     argp.add_argument('-c', '--clean', action = 'store_true', default = False,
         dest = 'clean', help = 'Limpiar las carpetas y archivos')
@@ -342,11 +305,7 @@ def main():
     if argumentos.clean == True:
         clearFolders()
 
-    modo = ''
-    if argumentos.local == True:
-        modo += 'Local'
-    if argumentos.externas == True:
-        modo += 'Externo'
+    modo = 'Local'
 
     NumeroURLS = 0
     initFolders()
@@ -361,7 +320,7 @@ def main():
 
 
 if __name__ == "__main__":
-    print(Fore.GREEN + """
+    print(Fore.LIGHTCYAN_EX + """
      __          __  _        _____                    _
      \ \        / / | |      / ____|                  | |
       \ \  /\  / /__| |__   | |     _ __ __ ___      _| | ___ _ __
