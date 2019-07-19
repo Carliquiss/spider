@@ -20,17 +20,15 @@ pip install -r requirements.txt
 ```
 
 ## Usage ⌨️
-The URL is givem by the "-u" param: -u url (in format http://www.example.com)
+The URL is given by the "-u" param: -u url (in format http://www.example.com)
   
 If you want to crawl that URL for looking for local links just use the "-l" option: 
 ```
-python spider.py -u <url> -l
+python spider.py -u <url>
 ```
 You can also use the "-c" param to clear all folders and files created by the crawler 
 ```
-python spider.py -u <url> -l -c
+python spider.py -u <url> -c
 ```
- Or
-```
-python spider.py -u <url> -lc
-```
+This also save the externasl URLs from the local links under the "URLS_externas" folder. 
+
