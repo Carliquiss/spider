@@ -331,6 +331,13 @@ def main():
     if argumentos.url != "":
 
         try:
+            if argumentos.url.split("/")[0] == "http:" or argumentos.url.split("/")[0] == "https:":
+                print(Fore.GREEN + "URL okey")
+
+            else:
+                argumentos.url = "http://" + argumentos.url
+                print("URL changed to " + argumentos.url)
+
             NumeroURLS = 0
 
             startTime = time.time()
