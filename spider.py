@@ -323,7 +323,7 @@ def main():
 
 
     """)
-    
+
     modo = 'Local'
     initFolders()
 
@@ -357,6 +357,7 @@ def main():
                     startTime = time.time()
 
                     try:
+
                         NumeroURLS.append(CrawlingIterative(linea, modo))
                         EliminarArchivosInnecesarios()
 
@@ -365,9 +366,18 @@ def main():
 
                     except:
                         print("Hubo algún problema con la URL: " + linea)
+                        NumeroURLS.append(0)
 
                     urls_analizadas.add(linea)
                     Numero_linea += 1
+
+            print(Fore.LIGHTGREEN_EX + "\n\n____________________________________________\n")
+            print(Fore.LIGHTCYAN_EX + "\t\tResumen: \n")
+
+            for i in range(len(lineas)):
+                print(Fore.LIGHTGREEN_EX + "URL: {} analizada, encontrados {} enlaces locales".format(
+                    lineas[i], NumeroURLS[i], end = ""))
+                print()
 
         except:
             print(Fore.RED + "Hay algún problema con el fichero de entrada")
