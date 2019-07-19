@@ -402,9 +402,5 @@ def main():
             print(Fore.RED + "Hay algún problema con el fichero de entrada")
 
 
-
-
-
-
 if __name__ == "__main__":
     main()
