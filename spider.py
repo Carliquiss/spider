@@ -329,11 +329,16 @@ def main():
     initFolders()
 
     if argumentos.url != "":
-        NumeroURLS = 0
 
-        startTime = time.time()
-        NumeroURLS = CrawlingIterative(argumentos.url, modo)
-        EliminarArchivosInnecesarios()
+        try:
+            NumeroURLS = 0
+
+            startTime = time.time()
+            NumeroURLS = CrawlingIterative(argumentos.url, modo)
+            EliminarArchivosInnecesarios()
+
+        except:
+            print(Fore.RED + "\nError en la url (enter http(s):// + domain)\n")
 
 
         print(Fore.LIGHTMAGENTA_EX + "El programa ha tardado: " + str(time.time() - startTime) + " segundos")
