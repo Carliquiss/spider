@@ -285,6 +285,7 @@ def main():
         -u <url> : URL (con http://) a la que se quiere hacer el crawling
         -i <input_file>      : Si se quieren leer urls de un archivo
         -c       : Si se quieren guardar solo los enlaces externos
+
     """
 
     url = ''
@@ -312,7 +313,17 @@ def main():
     if argumentos.verbose == False:
         blockPrintOutput()
 
+    print(Fore.LIGHTCYAN_EX + """
+     __          __  _        _____                    _
+     \ \        / / | |      / ____|                  | |
+      \ \  /\  / /__| |__   | |     _ __ __ ___      _| | ___ _ __
+       \ \/  \/ / _ \ '_ \  | |    | '__/ _` \ \ /\ / / |/ _ \ '__|
+        \  /\  /  __/ |_) | | |____| | | (_| |\ V  V /| |  __/ |
+         \/  \/ \___|_.__/   \_____|_|  \__,_| \_/\_/ |_|\___|_|
 
+
+    """)
+    
     modo = 'Local'
     initFolders()
 
@@ -367,15 +378,4 @@ def main():
 
 
 if __name__ == "__main__":
-    print(Fore.LIGHTCYAN_EX + """
-     __          __  _        _____                    _
-     \ \        / / | |      / ____|                  | |
-      \ \  /\  / /__| |__   | |     _ __ __ ___      _| | ___ _ __
-       \ \/  \/ / _ \ '_ \  | |    | '__/ _` \ \ /\ / / |/ _ \ '__|
-        \  /\  /  __/ |_) | | |____| | | (_| |\ V  V /| |  __/ |
-         \/  \/ \___|_.__/   \_____|_|  \__,_| \_/\_/ |_|\___|_|
-
-
-    """)
-
     main()
