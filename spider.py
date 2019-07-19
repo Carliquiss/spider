@@ -393,7 +393,7 @@ def main():
             print(Fore.LIGHTGREEN_EX + "\n\n____________________________________________\n")
             print(Fore.LIGHTCYAN_EX + "\t\tResumen: \n")
 
-            for i in range(len(lineas)):
+            for i in range(len(NumeroURLS)):
                 print(Fore.LIGHTGREEN_EX + "URL: {} analizada, encontrados {} enlaces locales".format(
                     lineas[i], NumeroURLS[i], end = ""))
                 print()
