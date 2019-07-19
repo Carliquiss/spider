@@ -131,9 +131,21 @@ def selectLocalOrExternalLinks(enlaces, url):
                         enlace = trozo_url + enlace[1::]
                         urlsLocales.append(enlace)
 
+                    if(enlace[0] == " "):
+                        enlace = enlace[1:len(enlace)]
+
+                        if enlace[0] != "/":
+                            enlace = "/" + enlace
+                            urlsLocales.append("http://" + baseURL + enlace)
+
+                        else:
+                            urlsLocales.append("http://" + baseURL + enlace)
+
                     else:
                         enlace = "/" + enlace
                         urlsLocales.append("http://" + baseURL + enlace)
+
+
                 else:
 
                     urlsLocales.append("http://" + baseURL + enlace)
