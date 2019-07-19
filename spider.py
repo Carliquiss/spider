@@ -215,7 +215,6 @@ def CrawlPage(url_principal, modo):
 
 
     if modo == "Local":
-        print(Fore.RED + "------------- Modo Local -------------")
 
         print(*linksLocales, sep = "\n", file=open(PATH_LOCALES + nombre_fichero + ".txt", "a"))
         removeDuplicatedLines(PATH_LOCALES + nombre_fichero + ".txt")
@@ -232,8 +231,6 @@ def CrawlPage(url_principal, modo):
         #Este modo pasará a ser el modo Default, implementado ahora en local
 
 
-    print(Fore.GREEN + "Proceso terminado correctamente....\n\n")
-
     return linksLocales, linksExternos
 
 
@@ -243,7 +240,7 @@ def CrawlingIterative(Primera_url, modo):
 
     Los parámetros son:
         Primera_url:string: URL que se va a crawlear de forma iterativa
-        modo:str: Puede ser Local o Lista
+        modo:str: Puede ser Local o Externo
     """
 
     #Aqui se debe poner de forma iterativa el crawling
@@ -274,6 +271,11 @@ def CrawlingIterative(Primera_url, modo):
 
     return len(enlaces_visitados)
 
+
+def blockPrintOutput():
+    sys.stdout = open(os.devnull, 'w')
+
+
 def main():
     """
     Función principal donde se comprueban los parámetros de la función y
@@ -282,7 +284,7 @@ def main():
     Los parámetros son:
         -u <url> : URL (con http://) a la que se quiere hacer el crawling
         -i <input_file>      : Si se quieren leer urls de un archivo
-        -c       : Se quieren limpiar las carpetas con los archivos de los escaneos
+        -c       : Si se quieren guardar solo los enlaces externos
     """
 
     url = ''
@@ -290,32 +292,77 @@ def main():
     argp = ArgumentParser(description = "Crawler de páginas web")
 
     argp.add_argument('-u', '--url', help = 'URL a la que se quiere hacer el crawling',
-        required = True)
+        required = False, default = "")
 
-    argp.add_argument('-i', '--input_file', action = 'store_true', default = False, dest = 'list',
+    argp.add_argument('-i', '--input_file', dest = 'FileName',
         help = 'Si se quiere indicar una lista de urls')
 
     argp.add_argument('-c', '--clean', action = 'store_true', default = False,
         dest = 'clean', help = 'Limpiar las carpetas y archivos')
 
+    argp.add_argument('-v', '--verbose', action = 'store_true', default = False,
+        dest = 'verbose', help = 'Mostrar la salida por la pantalla')
+
 
     argumentos = argp.parse_args()
-
 
     if argumentos.clean == True:
         clearFolders()
 
+    if argumentos.verbose == False:
+        blockPrintOutput()
+
+
     modo = 'Local'
-
-    NumeroURLS = 0
     initFolders()
-    startTime = time.time()
-    NumeroURLS = CrawlingIterative(argumentos.url, modo)
-    EliminarArchivosInnecesarios()
+
+    if argumentos.url != "":
+        NumeroURLS = 0
+
+        startTime = time.time()
+        NumeroURLS = CrawlingIterative(argumentos.url, modo)
+        EliminarArchivosInnecesarios()
 
 
-    print(Fore.LIGHTMAGENTA_EX + "El programa ha tardado: " + str(time.time() - startTime) + " segundos")
-    print("Se han escaneado: " + str(NumeroURLS) + " URLs")
+        print(Fore.LIGHTMAGENTA_EX + "El programa ha tardado: " + str(time.time() - startTime) + " segundos")
+        print("Se han escaneado: " + str(NumeroURLS) + " URLs")
+
+    else:
+
+        try:
+            archivo = open(argumentos.FileName, "r")
+            lineas = archivo.read().splitlines()
+
+            Numero_linea = 0
+            NumeroURLS = []
+            urls_analizadas = set()
+
+            for linea in lineas:
+
+                if linea not in urls_analizadas:
+
+                    print(Fore.LIGHTBLUE_EX + "\n\nAnalizando URL {} de {}".format(Numero_linea+1, len(lineas)))
+
+                    startTime = time.time()
+
+                    try:
+                        NumeroURLS.append(CrawlingIterative(linea, modo))
+                        EliminarArchivosInnecesarios()
+
+                        print(Fore.LIGHTMAGENTA_EX + "Para la URL {} el programa ha tardado: ".format(linea) +
+                            str(time.time() - startTime) + " segundos")
+
+                    except:
+                        print("Hubo algún problema con la URL: " + linea)
+
+                    urls_analizadas.add(linea)
+                    Numero_linea += 1
+
+        except:
+            print(Fore.RED + "Hay algún problema con el fichero de entrada")
+
+
+
 
 
 
