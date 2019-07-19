@@ -363,6 +363,13 @@ def main():
 
             for linea in lineas:
 
+                if linea.split("/")[0] == "http:" or argumentos.url.split("/")[0] == "https:":
+                    print(Fore.GREEN + "URL okey")
+
+                else:
+                    linea = "http://" + linea
+                    print("URL changed to " + linea)
+
                 if linea not in urls_analizadas:
 
                     print(Fore.LIGHTBLUE_EX + "\n\nAnalizando URL {} de {}".format(Numero_linea+1, len(lineas)))
