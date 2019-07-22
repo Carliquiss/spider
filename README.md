@@ -16,7 +16,7 @@ git clone https://github.com/Carliquiss/spider
 ```
 Then run the following command to install needed libs:
 ```
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ## Usage ⌨️
@@ -24,17 +24,17 @@ The URL is given by the "-u" param: -u url (in format http://www.example.com)
   
 If you want to crawl that URL for looking for local links just use the "-l" option: 
 ```
-python spider.py -u <url>
+python3 spider.py -u <url>
 ```
 You can also use the "-c" param to clear all folders and files created by the crawler 
 ```
-python spider.py -u <url> -c
+python3 spider.py -u <url> -c
 ```
 This also save the externasl URLs from the local links under the "URLS_externas" folder.  
   
 If you want to get the urls from a file just use "-i input_file":
 ```
-python spider.py -i <input_file>
+python3 spider.py -i <input_file>
 ```
 For all the options you can add the verbose mode with "-v"
 ```
