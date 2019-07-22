@@ -38,14 +38,14 @@ python3 spider.py -i <input_file>
 ```
 For all the options you can add the verbose mode with "-v"
 ```
-python spider.py -i <input_file> -v
+python3 spider.py -i <input_file> -v
 ```
 Or
 ```
-python spider.py -u <url> -v
+python3 spider.py -u <url> -v
 ```
 ```
-python spider.py -i <input_file> -cv
+python3 spider.py -i <input_file> -cv
 ```
 
 
