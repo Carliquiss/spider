@@ -284,7 +284,7 @@ def main():
     Los parámetros son:
         -u <url>            : URL (con http://) a la que se quiere hacer el crawling
         -i <input_file>     : Si se quieren leer urls de un archivo
-        -c                  : Si se quieren guardar solo los enlaces externos
+        -c                  : Si se quieren borrar las carpetas y archivos ya creados
         -v                  : Activar el modo verboso
 
     """
@@ -363,7 +363,7 @@ def main():
 
             for linea in lineas:
                 if linea.split("/")[0] == "http:" or linea.split("/")[0] == "https:":
-                    print(Fore.GREEN + "URL okey")
+                    print(Fore.GREEN + "Formato URL okey")
 
                 else:
                     linea = "http://" + linea
