@@ -151,8 +151,7 @@ def selectLocalOrExternalLinks(enlaces, url):
                     urlsLocales.append("http://" + baseURL + enlace)
 
             except:
-                print("Hubo algun fallo en la URL (posiblemente URL en blanco)")
-                print("Esta sería la URL: " + str(enlace) + "\n")
+                pass
 
 
     return urlsLocales, urlsExternas
@@ -206,7 +205,7 @@ def CrawlPage(url_principal, modo):
                      o tambien a las externas.
     """
 
-    print(Fore.YELLOW + "\nAnalizando: " +  url_principal)
+    print(Fore.YELLOW + "\nAnalizando: " +  url_principal, end = " ")
 
     #nombre_fichero = "/" + url_principal.replace("/", "_")
     baseURL = url_principal.split("/")[2]
@@ -230,6 +229,7 @@ def CrawlPage(url_principal, modo):
         print(Fore.RED + "------------- Modo Mixto (Local + Externo) -------------")
         #Este modo pasará a ser el modo Default, implementado ahora en local
 
+    print(Fore.GREEN + "OK")
 
     return linksLocales, linksExternos
 
@@ -332,7 +332,7 @@ def main():
 
         try:
             if argumentos.url.split("/")[0] == "http:" or argumentos.url.split("/")[0] == "https:":
-                print(Fore.GREEN + "URL okey")
+                print(Fore.GREEN + "URL OK")
 
             else:
                 argumentos.url = "http://" + argumentos.url
@@ -348,7 +348,7 @@ def main():
             print(Fore.RED + "\nError en la url (enter http(s):// + domain)\n")
 
 
-        print(Fore.LIGHTMAGENTA_EX + "El programa ha tardado: " + str(time.time() - startTime) + " segundos")
+        print(Fore.LIGHTMAGENTA_EX + "\nEl programa ha tardado: " + str(time.time() - startTime) + " segundos")
         print("Se han escaneado: " + str(NumeroURLS) + " URLs")
 
     else:
@@ -380,7 +380,7 @@ def main():
                         NumeroURLS.append(CrawlingIterative(linea, modo))
                         EliminarArchivosInnecesarios()
 
-                        print(Fore.LIGHTMAGENTA_EX + "Para la URL {} el programa ha tardado: ".format(linea) +
+                        print(Fore.LIGHTMAGENTA_EX + "\nPara la URL {} el programa ha tardado: ".format(linea) +
                             str(time.time() - startTime) + " segundos")
 
                     except:
