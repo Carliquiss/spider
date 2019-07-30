@@ -22,11 +22,8 @@ pip3 install -r requirements.txt
 ## Usage ⌨️
 The URL is given by the "-u" param: -u url (in format http://www.example.com)
   
-If you want to crawl that URL for looking for local links just use the "-l" option: 
-```
-python3 spider.py -u <url>
-```
-You can also use the "-c" param to clear all folders and files created by the crawler 
+
+You can use the "-c" param to clear all folders and files created by the crawler created in previous usages
 ```
 python3 spider.py -u <url> -c
 ```
