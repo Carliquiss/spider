@@ -118,7 +118,7 @@ def selectLocalOrExternalLinks(enlaces, url):
                 urlsLocales.append(enlace)
 
             else:
-                urlsExternas.append(enlace)
+                urlsExternas.append(enlace + " from ----> " + url)
 
         else:
             try:
